@@ -1,0 +1,13 @@
+name: Docker build
+
+on:
+  workflow_call
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with Docker
+        run: docker build .
+
