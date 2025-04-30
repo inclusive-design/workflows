@@ -2,6 +2,14 @@ name: Publish release
 
 on:
   workflow_call:
+    inputs:
+      GHA_APP_ID:
+        description: 'GitHub app ID'
+        required: true
+    secrets:
+      GHA_PRIVATE_KEY:
+        description: 'GitHub app private key'
+        required: true
 
 jobs:
   release-please:
@@ -14,7 +22,7 @@ jobs:
       - uses: actions/create-github-app-token@v2
         id: app-token
         with:
-          app-id: ${{ vars.GHA_APP_ID }}
+          app-id: ${{ inputs.GHA_APP_ID }}
           private-key: ${{ secrets.GHA_PRIVATE_KEY }}
 
       - uses: googleapis/release-please-action@v4
