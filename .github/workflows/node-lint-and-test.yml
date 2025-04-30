@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  node-lint-and-test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -12,8 +12,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install dependencies, lint files and run tests
+      - name: Install dependencies and lint files
         run: |
           npm ci
           npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies and run tests
+        run: |
+          npm ci
           npm test

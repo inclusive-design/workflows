@@ -4,11 +4,11 @@ on:
   workflow_call:
     secrets:
       CODECOV_TOKEN:
-        description: 'Token for code coverage uploads'
+        description: Token for code coverage uploads
         required: true
 
 jobs:
-  lint-and-test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,16 +16,28 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install dependencies, lint files and run tests
+      - name: Install dependencies and lint files
         run: |
           npm ci
           npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies and run tests
+        run: |
+          npm ci
           npm test
       - name: Save code coverage to artifact
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage
-          path: "coverage/lcov.info"
+          path: coverage/lcov.info
           retention-days: 5
 
   upload-coverage:
