@@ -2,6 +2,10 @@ name: Lint and test with coverage
 
 on:
   workflow_call:
+  secrets:
+    CODECOV_TOKEN:
+      description: 'Token for code coverage uploads'
+      required: true
 
 jobs:
   lint-and-test:
@@ -23,6 +27,7 @@ jobs:
           name: code-coverage
           path: "coverage/lcov.info"
           retention-days: 5
+
   upload-coverage:
     runs-on: ubuntu-latest
     needs: lint-and-test
