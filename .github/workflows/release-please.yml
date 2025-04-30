@@ -6,6 +6,7 @@ on:
       GHA_APP_ID:
         description: 'GitHub app ID'
         required: true
+        type: string
     secrets:
       GHA_PRIVATE_KEY:
         description: 'GitHub app private key'
