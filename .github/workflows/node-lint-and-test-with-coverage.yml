@@ -2,10 +2,10 @@ name: Lint and test with coverage
 
 on:
   workflow_call:
-  secrets:
-    CODECOV_TOKEN:
-      description: 'Token for code coverage uploads'
-      required: true
+    secrets:
+      CODECOV_TOKEN:
+        description: 'Token for code coverage uploads'
+        required: true
 
 jobs:
   lint-and-test:
