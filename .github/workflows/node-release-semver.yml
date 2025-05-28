@@ -49,9 +49,7 @@ jobs:
       - name: Update package versions
         if: ${{ steps.draft.outputs.tag_name }}
         run: |
-          tmp=$(mktemp)
-          jq '.version = "${{ steps.draft.outputs.resolved_version }}"' package.json > "$tmp" && mv "$tmp" package.json
-          jq '.version = "${{ steps.draft.outputs.resolved_version }}"' package-lock.json > "$tmp" && mv "$tmp" package-lock.json
+          npm version ${{ steps.draft.outputs.resolved_version }} --no-git-tag-version
       - name: Create pull request
         if: ${{ steps.draft.outputs.tag_name }}
         uses: peter-evans/create-pull-request@v7
