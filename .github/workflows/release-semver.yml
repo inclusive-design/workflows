@@ -44,7 +44,6 @@ jobs:
         uses: stefanzweifel/changelog-updater-action@v1
         with:
           latest-version: ${{ steps.draft.outputs.tag_name }}
-          heading-text: ${{ steps.draft.outputs.resolved_version }}
           release-notes: ${{ steps.draft.outputs.body }}
           parse-github-usernames: true
       - name: Update package versions
