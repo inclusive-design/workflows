@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  workflow_call:
+    inputs:
+      GHA_APP_ID:
+        description: "GitHub app ID"
+        required: true
+        type: string
+    secrets:
+      GHA_PRIVATE_KEY:
+        description: "GitHub app private key"
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ inputs.GHA_APP_ID }}
+          private-key: ${{ secrets.GHA_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+      - name: Publish release
+        if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'chore(release)')
+        uses: release-drafter/release-drafter@v6
+        with:
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Generate release
+        if: github.event_name == 'pull_request' || github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore(release)')
+        uses: release-drafter/release-drafter@v6
+        id: draft
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Update changelog
+        if: ${{ steps.draft.outputs.tag_name }}
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ steps.draft.outputs.tag_name }}
+          release-notes: ${{ steps.draft.outputs.body }}
+          parse-github-usernames: true
+      - name: Update package versions
+        if: ${{ steps.draft.outputs.tag_name }}
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{ steps.draft.outputs.resolved_version }}"' package.json > "$tmp" && mv "$tmp" package.json
+          jq '.version = "${{ steps.draft.outputs.resolved_version }}"' package-lock.json > "$tmp" && mv "$tmp" package-lock.json
+      - name: Create pull request
+        if: ${{ steps.draft.outputs.tag_name }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(release): release ${{ steps.draft.outputs.tag_name }}"
+          title: "chore(release): release ${{ steps.draft.outputs.tag_name }}"
+          body: "Update changelog with release notes for ${{ steps.draft.outputs.tag_name }}."
+          branch: changelog
+          labels: changelog
+          token: ${{ steps.app-token.outputs.token }}
