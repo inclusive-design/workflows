@@ -34,7 +34,7 @@ jobs:
           npm ci
           npm test
       - name: Save code coverage to artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: code-coverage
           path: coverage/lcov.info
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Fetch code coverage artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: code-coverage
       - name: Upload coverage to Codecov
