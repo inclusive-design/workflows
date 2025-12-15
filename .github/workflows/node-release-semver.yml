@@ -52,7 +52,7 @@ jobs:
           npm version ${{ steps.draft.outputs.resolved_version }} --no-git-tag-version
       - name: Create pull request
         if: ${{ steps.draft.outputs.tag_name }}
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore(release): release ${{ steps.draft.outputs.tag_name }}"
           title: "chore(release): release ${{ steps.draft.outputs.tag_name }}"
