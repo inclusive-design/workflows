@@ -33,6 +33,10 @@ jobs:
         run: |
           npm ci
           npm test
+      - name: Test commit linting
+        if: ${{ hashFiles('commitlint.config.js') != '' }}
+        run: |
+          echo 'fix: make sure commitlint works' | npx --no-install commitlint
       - name: Save code coverage to artifact
         uses: actions/upload-artifact@v6
         with:
