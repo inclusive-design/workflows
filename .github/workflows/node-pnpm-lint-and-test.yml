@@ -17,7 +17,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies and lint files
         run: |
-          pnpm install
+          pnpm install --frozen-lockfile
           pnpm lint
 
   test:
@@ -33,7 +33,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies and run tests
         run: |
-          pnpm install
+          pnpm install --frozen-lockfile
           pnpm test
       - name: Test commit linting
         if: ${{ hashFiles('commitlint.config.js') != '' }}
