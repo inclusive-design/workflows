@@ -38,7 +38,7 @@ jobs:
         run: |
           echo 'fix: make sure commitlint works' | npx --no-install commitlint
       - name: Save code coverage to artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: code-coverage
           path: coverage/lcov.info
@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Fetch code coverage artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: code-coverage
       - name: Upload coverage to Codecov
