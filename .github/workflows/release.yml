@@ -34,7 +34,7 @@ jobs:
           echo "version=${VERSION}.${SHA}" >> "$GITHUB_OUTPUT"
       - name: Publish release
         if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         with:
           publish: true
           tag: ${{ steps.calver.outputs.version }}
@@ -44,7 +44,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
       - name: Generate release
         if: github.event_name == 'pull_request' || github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         id: draft
         with:
           tag: ${{ steps.calver.outputs.version }}
