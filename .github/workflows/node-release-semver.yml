@@ -28,14 +28,14 @@ jobs:
       - uses: actions/checkout@v6
       - name: Publish release
         if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         with:
           publish: true
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
       - name: Generate release
         if: github.event_name == 'pull_request' || github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         id: draft
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
