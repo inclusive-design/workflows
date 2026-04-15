@@ -25,7 +25,7 @@ jobs:
         with:
           app-id: ${{ inputs.GHA_APP_ID }}
           private-key: ${{ secrets.GHA_PRIVATE_KEY }}
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.0
       - name: Generate version
         id: calver
         run: |
@@ -34,27 +34,30 @@ jobs:
           echo "version=${VERSION}.${SHA}" >> "$GITHUB_OUTPUT"
       - name: Publish release
         if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7.2.0
         with:
           publish: true
           tag: ${{ steps.calver.outputs.version }}
           name: ${{ steps.calver.outputs.version }}
           version: ${{ steps.calver.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Label pull request
+        if: github.event_name == 'pull_request'
+        uses: release-drafter/release-drafter/autolabeler@v7.2.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
       - name: Generate release
         if: github.event_name == 'pull_request' || github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7.2.0
         id: draft
         with:
           tag: ${{ steps.calver.outputs.version }}
           name: ${{ steps.calver.outputs.version }}
           version: ${{ steps.calver.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          token: ${{ steps.app-token.outputs.token }}
       - name: Update changelog
         if: ${{ steps.draft.outputs.tag_name }}
-        uses: stefanzweifel/changelog-updater-action@v1
+        uses: stefanzweifel/changelog-updater-action@v1.12.0
         with:
           latest-version: ${{ steps.draft.outputs.tag_name }}
           release-notes: ${{ steps.draft.outputs.body }}
@@ -62,7 +65,7 @@ jobs:
           parse-github-usernames: true
       - name: Create pull request
         if: ${{ steps.draft.outputs.tag_name }}
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@v8.1.1
         with:
           add-paths: CHANGELOG.md
           commit-message: "chore(release): release ${{ steps.draft.outputs.tag_name }}"
