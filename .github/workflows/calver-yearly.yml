@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  lint:
+  bump:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
@@ -12,14 +12,32 @@ jobs:
         with:
           client-id: ${{ vars.GHA_APP_ID }}
           private-key: ${{ secrets.GHA_PRIVATE_KEY }}
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
       - name: Set version
         id: version
-        run: echo "version='$(date '+%Y').1.0'" >> $GITHUB_OUTPUT
-      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          branch: yearly-version
-          title: 'chore(release): bump version'
-          body: "Release-As: ${{ steps.version.outputs.version }}"
-          labels: chore,changelog
+        run: echo "version=$(date '+%Y').1.0" >> $GITHUB_OUTPUT
+
+      - name: Get GitHub App user ID
+        id: get-user-id
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Update values for git user config
+        run: |
+          echo "GIT_USER_NAME=${{ steps.app-token.outputs.app-slug }}[bot]" >> $GITHUB_ENV
+          echo "GIT_USER_EMAIL=${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com" >> $GITHUB_ENV
+
+      - name: Bump version
+        run: |
+          git config --local user.email "$GIT_USER_EMAIL"
+          git config --local user.name "$GIT_USER_NAME"
+          git checkout dev
+          git commit --allow-empty -m "chore(release): bump version" -m "Release-As: ${{ steps.version.outputs.version }}"
+          git push origin dev
