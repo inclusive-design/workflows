@@ -2,7 +2,15 @@ name: Bump version month
 
 on:
   workflow_call:
-
+    inputs:
+      GHA_APP_ID:
+        description: 'GitHub app ID'
+        required: true
+        type: string
+    secrets:
+      GHA_PRIVATE_KEY:
+        description: 'GitHub app private key'
+        required: true
 jobs:
   bump:
     runs-on: ubuntu-latest
@@ -10,7 +18,7 @@ jobs:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
         with:
-          client-id: ${{ vars.GHA_APP_ID }}
+          client-id: ${{ inputs.GHA_APP_ID }}
           private-key: ${{ secrets.GHA_PRIVATE_KEY }}
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
